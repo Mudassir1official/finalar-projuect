@@ -24,10 +24,11 @@ device-orientation-permission-ui="enabled: false">
 id="promoVideo"
 src="dethnote.mp4"
 autoplay
-loop
 muted
+loop
 playsinline
-webkit-playsinline>
+webkit-playsinline
+crossorigin="anonymous">
 </video>
 
 <img id="instagramIcon" src="instagram.png">
@@ -39,6 +40,9 @@ webkit-playsinline>
 <a-camera
 position="0 0 0"
 look-controls="enabled: false">
+<a-camera>
+  <a-cursor raycaster="objects: .clickable"></a-cursor>
+</a-camera>
 </a-camera>
 
 <a-entity mindar-image-target="targetIndex: 0">
@@ -46,11 +50,15 @@ look-controls="enabled: false">
 <a-video
 src="#promoVideo"
 position="0 0.5 0"
-autoplay
-loop
 width="1"
 height="0.552"
 rotation="60 0 0">
+autoplay
+muted
+loop
+playsinline
+webkit-playsinline
+crossorigin="anonymous">
 </a-video>
 
 <a-plane
@@ -90,15 +98,8 @@ id="youtubeButton">
 
 <script>
 
-document
-.querySelector("#instaButton")
-.addEventListener("click", function () {
-
-window.open(
-"https://instagram.com/",
-"_blank"
-);
-
+document.querySelector("#instaButton").addEventListener("click", () => {
+   window.location.href = "https://instagram.com";
 });
 
 </script>
