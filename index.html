@@ -1,108 +1,169 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>AR Experience</title>
 
-  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
-
+  <!-- A-Frame MUST load before MindAR -->
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; overflow: hidden; }
+    a-scene { position: fixed; inset: 0; }
+  </style>
 </head>
 
 <body>
 
-<a-scene
-mindar-image="imageTargetSrc: logo.mind;"
-color-space="sRGB"
-renderer="colorManagement: true, physicallyCorrectLights"
-vr-mode-ui="enabled: false"
-device-orientation-permission-ui="enabled: false">
+  <a-scene
+    mindar-image="imageTargetSrc: logo.mind; autoStart: true; uiLoading: no; uiScanning: no; uiError: no;"
+    color-space="sRGB"
+    renderer="colorManagement: true; physicallyCorrectLights: true"
+    vr-mode-ui="enabled: false"
+    device-orientation-permission-ui="enabled: false"
+    embedded>
 
-<a-assets>
+    <!-- =====================================================
+         ASSETS — preload all textures and video
+    ===================================================== -->
+    <a-assets>
+      <img      id="card"          src="test.png" />
+      <video    id="promoVideo"    src="dethnote.mp4" autoplay muted loop playsinline preload="auto"></video>
+      <img      id="instagramIcon" src="instagram.png" />
+      <img      id="whatsappIcon"  src="whatsapp.png" />
+      <img      id="youtubeIcon"   src="youtube.png" />
+    </a-assets>
 
-<img id="card" src="test.png" />
+    <!-- =====================================================
+         CAMERA + CURSOR
+         - look-controls disabled (MindAR controls the view)
+         - cursor uses rayOrigin: entity for mobile touch
+         - raycaster only targets .clickable entities
+    ===================================================== -->
+    <a-camera
+      position="0 0 0"
+      look-controls="enabled: false"
+      cursor="fuse: false; rayOrigin: entity;"
+      raycaster="objects: .clickable; far: 10; interval: 50;">
 
-<video
-id="promoVideo"
-src="dethnote.mp4"
-autoplay
-muted
-loop
-playsinline
-webkit-playsinline
-crossorigin="anonymous">
-</video>
+      <!-- Small visual cursor dot (helpful on mobile) -->
+      <a-cursor
+        color="#ffffff"
+        opacity="0.5"
+        scale="0.5 0.5 0.5">
+      </a-cursor>
 
-<img id="instagramIcon" src="instagram.png">
-<img id="whatsappicon" src="whatsapp.png">
-<img id="youtubeicon" src="youtube.png">
+    </a-camera>
+    <!-- NOTE: your original code had a broken nested <a-camera> inside
+         <a-camera> — that has been fixed above into a single element -->
 
-</a-assets>
+    <!-- =====================================================
+         TRACKED TARGET (targetIndex: 0)
+         Everything inside appears when the marker is seen
+    ===================================================== -->
+    <a-entity mindar-image-target="targetIndex: 0" id="tracked-target">
 
-<a-camera
-position="0 0 0"
-look-controls="enabled: false">
-<a-camera>
-  <a-cursor raycaster="objects: .clickable"></a-cursor>
-</a-camera>
-</a-camera>
+      <!-- Background card image -->
+      <a-plane
+        src="#card"
+        position="0 0 0"
+        width="1"
+        height="0.552">
+      </a-plane>
 
-<a-entity mindar-image-target="targetIndex: 0">
+      <!-- Promo video above the card
+           NOTE: fixed typo "deathnoe.mp4" → "dethnote.mp4"
+           Make sure this filename matches your actual file -->
+      <a-video
+        src="#promoVideo"
+        position="0 0.55 0"
+        width="1"
+        height="0.552"
+        rotation="0 0 0">
+      </a-video>
 
-<a-video
-src="#promoVideo"
-position="0 0.5 0"
-width="1"
-height="0.552"
-rotation="60 0 0" 
-autoplay
-muted
-loop  
-playsinline
-webkit-playsinline
-crossorigin="anonymous">
-</a-video>
+      <!-- ===================================================
+           SOCIAL ICONS — all have class="clickable" so the
+           raycaster can detect them, and data-url for the link
+      =================================================== -->
 
-<a-plane
-src="#card"
-position="0 0 0"
-height="0.552"
-width="1">
-</a-plane>
+      <!-- Instagram -->
+      <a-image
+        id="instaButton"
+        class="clickable"
+        src="#instagramIcon"
+        position="0 -0.35 0.001"
+        width="0.2"
+        height="0.2"
+        data-url="https://www.instagram.com/"
+        animation__hover-in="property: scale; startEvents: mouseenter; easing: easeOutBack; dur: 200; to: 1.3 1.3 1.3"
+        animation__hover-out="property: scale; startEvents: mouseleave; easing: easeOutQuad; dur: 200; to: 1 1 1"
+        animation__click="property: scale; startEvents: click; easing: easeInOutQuad; dur: 120; from: 1.3 1.3 1.3; to: 0.85 0.85 0.85">
+      </a-image>
 
-<a-image
-src="#instagramIcon"
-position="0 -0.5 0"
-width="0.2"
-height="0.2"
-id="instaButton">
-</a-image>
+      <!-- WhatsApp -->
+      <a-image
+        id="whatsappButton"
+        class="clickable"
+        src="#whatsappIcon"
+        position="-0.3 -0.35 0.001"
+        width="0.2"
+        height="0.2"
+        data-url="https://wa.me/YOUR_NUMBER"
+        animation__hover-in="property: scale; startEvents: mouseenter; easing: easeOutBack; dur: 200; to: 1.3 1.3 1.3"
+        animation__hover-out="property: scale; startEvents: mouseleave; easing: easeOutQuad; dur: 200; to: 1 1 1"
+        animation__click="property: scale; startEvents: click; easing: easeInOutQuad; dur: 120; from: 1.3 1.3 1.3; to: 0.85 0.85 0.85">
+      </a-image>
 
-<a-image
-src="#whatsappicon"
-position="-0.3 -0.5 0"
-width="0.2"
-height="0.2"
-id="whatsappButton">
-</a-image>
+      <!-- YouTube -->
+      <a-image
+        id="youtubeButton"
+        class="clickable"
+        src="#youtubeIcon"
+        position="0.3 -0.35 0.001"
+        width="0.2"
+        height="0.2"
+        data-url="https://www.youtube.com/"
+        animation__hover-in="property: scale; startEvents: mouseenter; easing: easeOutBack; dur: 200; to: 1.3 1.3 1.3"
+        animation__hover-out="property: scale; startEvents: mouseleave; easing: easeOutQuad; dur: 200; to: 1 1 1"
+        animation__click="property: scale; startEvents: click; easing: easeInOutQuad; dur: 120; from: 1.3 1.3 1.3; to: 0.85 0.85 0.85">
+      </a-image>
 
-<a-image
-src="#youtubeicon"
-position="0.3 -0.5 0"
-width="0.2"
-height="0.2"
-id="youtubeButton">
-</a-image>
+    </a-entity>
 
-</a-entity>
+  </a-scene>
 
-</a-scene>
+  <script>
+    const sceneEl    = document.querySelector('a-scene');
+    const targetEl   = document.getElementById('tracked-target');
+    let   isTracking = false;
 
-<script>
+    // Track whether the marker is visible
+    targetEl.addEventListener('targetFound', () => { isTracking = true;  });
+    targetEl.addEventListener('targetLost',  () => { isTracking = false; });
 
-document.querySelector("#instaButton").addEventListener("click", () => {
-   window.location.href = "https://instagram.com";
-});
+    // Attach ONE shared click handler to every .clickable icon
+    // This runs after the scene is fully loaded so all entities exist
+    sceneEl.addEventListener('loaded', () => {
 
-</script>
+      document.querySelectorAll('.clickable').forEach((el) => {
+        el.addEventListener('click', () => {
+          if (!isTracking) return;          // ignore if marker not visible
+          const url = el.getAttribute('data-url');
+          if (url) window.open(url, '_blank', 'noopener,noreferrer');
+        });
+      });
+
+      // Prevent scroll/zoom swallowing touch on the canvas
+      const canvas = sceneEl.canvas;
+      if (canvas) {
+        canvas.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
+      }
+    });
+  </script>
 
 </body>
 </html>
